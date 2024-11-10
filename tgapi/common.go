@@ -1,4 +1,4 @@
-package events
+package tgapi
 
 type User struct {
 	ID        int64  `json:"id"`

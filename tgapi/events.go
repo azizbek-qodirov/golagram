@@ -1,21 +1,20 @@
 package tgapi
 
-import (
-	"api-test/tgapi/events"
-)
-
 type Event struct {
-	token         string
-	UpdateID      int64                 `json:"update_id"`
-	Message       *events.Message       `json:"message"`
-	CallbackQuery *events.CallbackQuery `json:"callback_query"`
-	EditedMessage *events.Message       `json:"edited_message"`
+	UpdateID      int64          `json:"update_id"`
+	Message       *Message       `json:"message"`
+	CallbackQuery *CallbackQuery `json:"callback_query"`
+	EditedMessage *Message       `json:"edited_message"`
 }
 
 type Events struct {
-	events []struct {
-		handler   func(*Event)
-		condition func(*Event) bool
+	messageEvents []struct {
+		handler   func(*Message)
+		condition func(*Message) bool
+	}
+	callbackQueryEvents []struct {
+		handler   func(*CallbackQuery)
+		condition func(*CallbackQuery) bool
 	}
 }
 
@@ -23,9 +22,16 @@ func NewEvents() *Events {
 	return &Events{}
 }
 
-func (e *Events) Add(event func(*Event), condition func(*Event) bool) {
-	e.events = append(e.events, struct {
-		handler   func(*Event)
-		condition func(*Event) bool
+func (e *Events) AddMessageEvent(event func(*Message), condition func(*Message) bool) {
+	e.messageEvents = append(e.messageEvents, struct {
+		handler   func(*Message)
+		condition func(*Message) bool
+	}{handler: event, condition: condition})
+}
+
+func (e *Events) AddCallbackQueryEvent(event func(*CallbackQuery), condition func(*CallbackQuery) bool) {
+	e.callbackQueryEvents = append(e.callbackQueryEvents, struct {
+		handler   func(*CallbackQuery)
+		condition func(*CallbackQuery) bool
 	}{handler: event, condition: condition})
 }

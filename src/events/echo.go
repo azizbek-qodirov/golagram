@@ -5,8 +5,9 @@ import (
 	"fmt"
 )
 
-func HandleOtherMessages(event *tgg.Event) {
-	err := event.Message.Reply(fmt.Sprintf("You sent: %s", event.Message.Text))
+func HandleOtherMessages(message *tgg.Message) {
+	err := message.Reply(fmt.Sprintf("You sent: %s", message.Text))
+	fmt.Println(message.Text)
 	if err != nil {
 		panic(err)
 	}

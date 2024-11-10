@@ -4,12 +4,12 @@ import (
 	tgg "api-test/tgapi"
 )
 
-func StartHandler(event *tgg.Event) {
-	err := event.Message.SendMessage("Start request received.")
+func StartHandler(message *tgg.Message) {
+	err := message.SendMessage("Start request received.")
 	if err != nil {
 		panic(err)
 	}
-	err = event.Message.Reply("Hi!")
+	err = message.Reply("Hi!")
 	if err != nil {
 		panic(err)
 	}

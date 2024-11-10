@@ -1,18 +1,24 @@
 package events
 
-import tgg "api-test/tgapi"
+import (
+	tgg "api-test/tgapi"
+	"database/sql"
+)
+
+type Handlers struct {
+	DB *sql.DB
+}
 
 func InitializeEvents(events *tgg.Events) {
-
-	events.Add(StartHandler, func(event *tgg.Event) bool {
-		return event.Message.Text == "/start"
+	events.AddMessageEvent(StartHandler, func(event *tgg.Message) bool {
+		return event.Text == "/start"
 	})
 
-	events.Add(HelpHandler, func(e *tgg.Event) bool {
+	events.AddCallbackQueryEvent(HelpHandler, func(e *tgg.CallbackQuery) bool {
 		return e.Message.Text == "/help"
 	})
 
-	events.Add(HandleOtherMessages, func(e *tgg.Event) bool {
+	events.AddMessageEvent(HandleOtherMessages, func(e *tgg.Message) bool {
 		return true
 	})
 
