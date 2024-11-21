@@ -1,25 +1,24 @@
 package events
 
 import (
+	user_events "api-test/src/events/user"
+	"api-test/src/storage"
 	tgg "api-test/tgapi"
-	"database/sql"
 )
 
 type Handlers struct {
-	DB *sql.DB
+	User *user_events.UserHandlers
+	// Admin *admin_events.AdminHandlers
 }
 
-func InitializeEvents(events *tgg.Events) {
-	events.AddMessageEvent(StartHandler, func(event *tgg.Message) bool {
-		return event.Text == "/start"
-	})
+func NewHandlers(stg *storage.Storage) *Handlers {
+	return &Handlers{
+		User: &user_events.UserHandlers{Storage: stg},
+		// Admin: &admin_events.AdminHandlers{Storage: stg},
+	}
+}
 
-	events.AddCallbackQueryEvent(HelpHandler, func(e *tgg.CallbackQuery) bool {
-		return e.Message.Text == "/help"
-	})
-
-	events.AddMessageEvent(HandleOtherMessages, func(e *tgg.Message) bool {
-		return true
-	})
-
+func (h *Handlers) InitializeEvents(events *tgg.Events) {
+	user_events.InitializeEvents(h.User, events)
+	// admin_events.InitializeEvents(handlers.Admin, events)
 }

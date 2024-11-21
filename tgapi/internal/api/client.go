@@ -1,6 +1,7 @@
 package api
 
 import (
+	"api-test/tgapi/models"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -102,17 +103,36 @@ func (c *Client) SetBotCommands(commands interface{}) error {
 	return nil
 }
 
-func (c *Client) SendMessage(chatID int64, text string, replyToMessageID *int64) error {
+func (c *Client) SendMessage(msg *models.MessageRequest) error {
 	params := map[string]interface{}{
-		"chat_id": chatID,
-		"text":    text,
+		"chat_id": msg.ChatID,
+		"text":    msg.Text,
 	}
 
-	if replyToMessageID != nil {
-		params["reply_to_message_id"] = *replyToMessageID
+	if msg.ReplyToMessageID != 0 {
+		params["reply_to_message_id"] = msg.ReplyToMessageID
 	}
 
 	resp, err := c.makeRequest("POST", fmt.Sprintf("%s%s/sendMessage", c.baseURL, c.token), params)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("unexpected status code: %d, response: %s", resp.StatusCode, string(body))
+	}
+	return nil
+}
+
+func (c *Client) EditMessageText(chatID int64, messageID int64, text string) error {
+	params := map[string]interface{}{
+		"chat_id":    chatID,
+		"message_id": messageID,
+		"text":       text,
+	}
+	resp, err := c.makeRequest("POST", fmt.Sprintf("%s%s/editMessageText", c.baseURL, c.token), params)
 	if err != nil {
 		return err
 	}

@@ -7,6 +7,10 @@ func emptyEvent() Event {
 		Message: &Message{
 			From: &User{},
 			Chat: &Chat{},
+			ReplyTo: &Message{
+				From: &User{},
+				Chat: &Chat{},
+			},
 		},
 		CallbackQuery: &CallbackQuery{
 			Message: &Message{

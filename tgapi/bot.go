@@ -64,6 +64,10 @@ func NewTelegramBot(token string) (*TelegramBot, error) {
 }
 
 func (b *TelegramBot) Run() error {
+	if b.eventChan == nil {
+		return errors.New("event channel is closed")
+	}
+
 	const numWorkers = 5
 	offset := 0
 

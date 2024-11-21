@@ -1,21 +1,27 @@
 package main
 
 import (
-	src_events "api-test/src/events"
+	"api-test/src/config"
+	"api-test/src/storage"
 	"api-test/src/utils"
 	"fmt"
 
+	src_events "api-test/src/events"
 	tgg "api-test/tgapi"
 )
 
-const BOT_TOKEN = "6652950296:AAEKXUjZbtDs4Cu_XE40tPiECMOU_Zu5iTI"
-
 func main() {
-	mybot, err := tgg.NewTelegramBot(BOT_TOKEN)
+	config := config.Load()
+	mybot, err := tgg.NewTelegramBot(config.BOT_TOKEN)
 	if err != nil {
 		panic(err)
 	}
 	defer mybot.Close()
+
+	storage, err := storage.NewPostgresStorage(config)
+	if err != nil {
+		panic(err)
+	}
 
 	err = utils.SetBotCommands(mybot)
 	if err != nil {
@@ -24,7 +30,8 @@ func main() {
 
 	events := tgg.NewEvents()
 
-	src_events.InitializeEvents(events)
+	handlers := src_events.NewHandlers(storage)
+	handlers.InitializeEvents(events)
 
 	mybot.RegisterEvents(events)
 
